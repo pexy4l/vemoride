@@ -69,7 +69,7 @@ export default function Landing() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Find your perfect ride in Lagos</h1>
           <p className="text-lg text-white/80 mb-8">Rent cars from trusted owners, with or without a driver</p>
-          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg [&_input]:text-gray-900 [&_input]:dark:text-white [&_button]:text-gray-900 [&_button]:dark:text-white">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg [&_input]:text-gray-900 dark:[&_input]:text-white [&_button[role=combobox]]:text-gray-900 dark:[&_button[role=combobox]]:text-white">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <Select value={location} onValueChange={setLocation}>
