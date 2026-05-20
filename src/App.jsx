@@ -1,47 +1,109 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import WhatsAppButton from '@/components/WhatsAppButton';
-import CookieConsent from '@/components/CookieConsent';
-import Home from '@/pages/Home';
-import Cars from '@/pages/Cars';
-import CarDetail from '@/pages/CarDetail';
-import Booking from '@/pages/Booking';
-import AirportPickup from '@/pages/AirportPickup';
-import About from '@/pages/About';
-import Contact from '@/pages/Contact';
-import Admin from '@/pages/Admin';
-import Privacy from '@/pages/Privacy';
-import Terms from '@/pages/Terms';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
-function App() {
+// Public
+import Landing from '@/pages/public/Landing';
+import Login from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
+
+// Customer
+import MyBookings from '@/pages/dashboard/customer/MyBookings';
+import SavedCars from '@/pages/dashboard/customer/SavedCars';
+
+// Owner
+import OwnerOverview from '@/pages/dashboard/owner/Overview';
+import MyCars from '@/pages/dashboard/owner/MyCars';
+import Drivers from '@/pages/dashboard/owner/Drivers';
+import BookingRequests from '@/pages/dashboard/owner/BookingRequests';
+import Availability from '@/pages/dashboard/owner/Availability';
+import Pricing from '@/pages/dashboard/owner/Pricing';
+import Earnings from '@/pages/dashboard/owner/Earnings';
+import AssignedTrips from '@/pages/dashboard/owner/AssignedTrips';
+import TripHistory from '@/pages/dashboard/owner/TripHistory';
+
+// Admin
+import AdminOverview from '@/pages/dashboard/admin/Overview';
+import Customers from '@/pages/dashboard/admin/Customers';
+import Owners from '@/pages/dashboard/admin/Owners';
+import AllCars from '@/pages/dashboard/admin/AllCars';
+import AllBookings from '@/pages/dashboard/admin/AllBookings';
+import Approvals from '@/pages/dashboard/admin/Approvals';
+
+// Shared
+import Notifications from '@/pages/dashboard/shared/Notifications';
+import Ratings from '@/pages/dashboard/shared/Ratings';
+import Profile from '@/pages/dashboard/shared/Profile';
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+}
+
+function DashboardRedirect() {
+  const { user } = useAuth();
+  if (user?.role === 'customer') return <Navigate to="/dashboard/bookings" />;
+  if (user?.role === 'drivercarowner') return <Navigate to="/dashboard/overview" />;
+  if (user?.role === 'admin') return <Navigate to="/dashboard/overview" />;
+  return <Navigate to="/login" />;
+}
+
+function AppRoutes() {
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cars" element={<Cars />} />
-            <Route path="/cars/:id" element={<CarDetail />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/airport-pickup" element={<AirportPickup />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-          </Routes>
-        </main>
-        <Footer />
-        <WhatsAppButton />
-        <CookieConsent />
-        <Toaster />
-      </div>
-    </Router>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+        <Route index element={<DashboardRedirect />} />
+
+        {/* Customer */}
+        <Route path="bookings" element={<MyBookings />} />
+        <Route path="saved" element={<SavedCars />} />
+
+        {/* Owner */}
+        <Route path="overview" element={<OwnerOverview />} />
+        <Route path="cars" element={<MyCars />} />
+        <Route path="drivers" element={<Drivers />} />
+        <Route path="booking-requests" element={<BookingRequests />} />
+        <Route path="availability" element={<Availability />} />
+        <Route path="pricing" element={<Pricing />} />
+        <Route path="earnings" element={<Earnings />} />
+        <Route path="trips" element={<AssignedTrips />} />
+        <Route path="trip-history" element={<TripHistory />} />
+
+        {/* Admin */}
+        <Route path="customers" element={<Customers />} />
+        <Route path="owners" element={<Owners />} />
+        <Route path="all-cars" element={<AllCars />} />
+        <Route path="all-bookings" element={<AllBookings />} />
+        <Route path="approvals" element={<Approvals />} />
+
+        {/* Shared */}
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="ratings" element={<Ratings />} />
+        <Route path="profile" element={<Profile />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  );
+}
