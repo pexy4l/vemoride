@@ -30,8 +30,8 @@ export default function CarDetail() {
         <div className="container mx-auto px-4 h-16 flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-300"><ArrowLeft className="h-5 w-5" /></button>
           <Link to="/" className="flex items-center gap-2">
-            <img src="/vemoride.svg" alt="VemoRide" className="h-8 w-8" />
-            <span className="font-bold text-lg dark:text-white">VemoRide</span>
+            <img src="/vemoride4.svg" alt="VemoRide" className="h-10 w-10" />
+            <span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span>
           </Link>
         </div>
       </header>
