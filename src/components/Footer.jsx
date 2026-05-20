@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/vemoride2.svg" alt="VemoRide" className="h-8 w-8" />
+              <img src="/vemoride3.svg" alt="VemoRide" className="h-8 w-8" />
               <span className="font-bold text-lg text-white">Vemo<span className="text-brand">Ride</span></span>
             </div>
             <p className="text-sm">Rent cars from trusted owners in Nigeria, with or without a driver.</p>
