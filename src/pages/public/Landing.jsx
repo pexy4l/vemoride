@@ -69,11 +69,11 @@ export default function Landing() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Find your perfect ride in Lagos</h1>
           <p className="text-lg text-white/80 mb-8">Rent cars from trusted owners, with or without a driver</p>
-          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg [&_input]:text-gray-900 dark:[&_input]:text-white [&_button[role=combobox]]:text-gray-900 dark:[&_button[role=combobox]]:text-white">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <Select value={location} onValueChange={setLocation}>
-                  <SelectTrigger><SelectValue placeholder="Select Location" /></SelectTrigger>
+                  <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Select Location" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Locations</SelectItem>
                     {nigerianStates.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -82,7 +82,7 @@ export default function Landing() {
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input type="date" className="pl-9" value={date} onChange={e => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} />
+                <Input type="date" className="pl-9 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" value={date} onChange={e => setDate(e.target.value)} min={new Date().toISOString().split('T')[0]} />
               </div>
               <Button className="bg-brand hover:bg-brand-dark w-full" onClick={() => setShowFilters(!showFilters)}><Filter className="h-4 w-4 mr-2" />Filters</Button>
             </div>
