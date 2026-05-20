@@ -45,6 +45,12 @@ function ProtectedRoute({ children }) {
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
+function RoleOverview() {
+  const { user } = useAuth();
+  if (user?.role === 'admin') return <AdminOverview />;
+  return <OwnerOverview />;
+}
+
 function DashboardRedirect() {
   const { user } = useAuth();
   if (user?.role === 'customer') return <Navigate to="/dashboard/bookings" />;
@@ -69,8 +75,8 @@ function AppRoutes() {
         <Route path="bookings" element={<MyBookings />} />
         <Route path="saved" element={<SavedCars />} />
 
-        {/* Owner */}
-        <Route path="overview" element={<OwnerOverview />} />
+        {/* Owner / Admin - shared overview route */}
+        <Route path="overview" element={<RoleOverview />} />
         <Route path="cars" element={<MyCars />} />
         <Route path="drivers" element={<Drivers />} />
         <Route path="booking-requests" element={<BookingRequests />} />
