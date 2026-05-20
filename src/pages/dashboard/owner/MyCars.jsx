@@ -74,8 +74,10 @@ function CarForm({ onSave, initial }) {
     images: ['https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800'],
     description: '', location: '', withDriver: true, selfDrive: true, assignedDriverId: null,
     pricing: { daily: 50000, weekly: 300000, monthly: 1000000, weekend: 60000, discount2Days: 5, discount7Days: 10, discount30Days: 15 },
+    features: [],
     ...initial,
   });
+  const [featureInput, setFeatureInput] = useState('');
 
   const handleSubmit = (e) => { e.preventDefault(); onSave(form); };
   const setField = (k, v) => setForm({ ...form, [k]: v });
@@ -102,6 +104,18 @@ function CarForm({ onSave, initial }) {
       <div className="grid grid-cols-2 gap-3">
         <div><Label>Monthly (₦)</Label><Input type="number" value={form.pricing.monthly} onChange={e => setPricing('monthly', e.target.value)} /></div>
         <div><Label>Weekend (₦)</Label><Input type="number" value={form.pricing.weekend} onChange={e => setPricing('weekend', e.target.value)} /></div>
+      </div>
+      <div>
+        <Label>Features (e.g. AC, Bluetooth)</Label>
+        <div className="flex gap-2 mt-1">
+          <Input value={featureInput} onChange={e => setFeatureInput(e.target.value)} placeholder="Add feature" onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (featureInput.trim()) { setForm({...form, features: [...(form.features || []), featureInput.trim()]}); setFeatureInput(''); } } }} />
+          <Button type="button" variant="outline" onClick={() => { if (featureInput.trim()) { setForm({...form, features: [...(form.features || []), featureInput.trim()]}); setFeatureInput(''); } }}>Add</Button>
+        </div>
+        <div className="flex flex-wrap gap-1 mt-2">
+          {(form.features || []).map((f, i) => (
+            <span key={i} className="text-xs bg-brand/10 text-brand px-2 py-1 rounded-full flex items-center gap-1">{f}<button type="button" onClick={() => setForm({...form, features: form.features.filter((_, j) => j !== i)})} className="text-brand/60 hover:text-brand">&times;</button></span>
+          ))}
+        </div>
       </div>
       <Button type="submit" className="w-full bg-brand hover:bg-brand-dark">{initial ? 'Update' : 'Add'} Car</Button>
     </form>

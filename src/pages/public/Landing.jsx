@@ -8,7 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Calendar, Star, Filter, Sun, Moon, Globe } from 'lucide-react';
+import { Search, Calendar, Star, Filter, Sun, Moon, Globe, MapPin, Heart } from 'lucide-react';
 import Footer from '@/components/Footer';
 import CookieConsent from '@/components/CookieConsent';
 
@@ -23,6 +23,12 @@ export default function Landing() {
   const [priceFilter, setPriceFilter] = useState('all');
   const [driverFilter, setDriverFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [favourites, setFavourites] = useState([]);
+
+  const toggleFav = (e, carId) => {
+    e.preventDefault();
+    setFavourites(f => f.includes(carId) ? f.filter(id => id !== carId) : [...f, carId]);
+  };
 
   const filteredCars = useMemo(() => {
     let result = cars.filter(c => c.status === 'available');
@@ -55,10 +61,7 @@ export default function Landing() {
                 <Link to="/dashboard"><Button size="sm" className="bg-brand hover:bg-brand-dark">Dashboard</Button></Link>
               </>
             ) : (
-              <>
-                <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-                <Link to="/register"><Button size="sm" className="bg-brand hover:bg-brand-dark">Register</Button></Link>
-              </>
+              <Link to="/login"><Button size="sm" className="bg-brand hover:bg-brand-dark">Sign In</Button></Link>
             )}
           </div>
         </div>
@@ -122,20 +125,20 @@ export default function Landing() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCars.map(car => (
-            <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative">
+              <button onClick={(e) => toggleFav(e, car.id)} className="absolute top-3 right-3 z-10 p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full">
+                <Heart className={`h-4 w-4 ${favourites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+              </button>
               <img src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-48 object-cover" />
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-bold dark:text-white">{car.make} {car.model}</h3>
                   <div className="flex items-center gap-1 text-sm"><Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /><span className="dark:text-gray-300">{car.rating}</span></div>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{car.year} - {car.type} - {car.seats} seats - {car.transmission}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{car.year} - {car.type} - {car.seats} seats - {car.transmission}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-3"><MapPin className="h-3 w-3" />{car.location}</p>
                 <div className="flex items-center justify-between">
                   <div><span className="text-xl font-bold text-brand">₦{car.pricing.daily.toLocaleString()}</span><span className="text-sm text-gray-500">/day</span></div>
-                </div>
-                <div className="flex gap-2 mt-2">
-                  {car.withDriver && <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded">With Driver</span>}
-                  {car.selfDrive && <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded">Self Drive</span>}
                 </div>
               </div>
             </Link>
