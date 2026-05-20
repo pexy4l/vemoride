@@ -7,6 +7,8 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 
 // Public
 import Landing from '@/pages/public/Landing';
+import CarDetail from '@/pages/public/CarDetail';
+import BookingRequest from '@/pages/public/BookingRequest';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 
@@ -55,6 +57,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/car/:id" element={<CarDetail />} />
+      <Route path="/car/:id/book" element={<ProtectedRoute><BookingRequest /></ProtectedRoute>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
