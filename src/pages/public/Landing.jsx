@@ -39,7 +39,7 @@ export default function Landing() {
   }, [location, date, typeFilter, transmissionFilter, priceFilter, driverFilter]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export default function Landing() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Find your perfect ride in Lagos</h1>
           <p className="text-lg text-white/80 mb-8">Rent cars from trusted owners, with or without a driver</p>
-          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg [&_input]:text-gray-900 [&_input]:dark:text-white [&_button]:text-gray-900 [&_button]:dark:text-white">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <Select value={location} onValueChange={setLocation}>
@@ -115,7 +115,7 @@ export default function Landing() {
       )}
 
       {/* Cars Grid */}
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto px-4 py-8 flex-1">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold dark:text-white">Available Cars</h2>
           <span className="text-sm text-gray-500">{filteredCars.length} car{filteredCars.length !== 1 ? 's' : ''} found</span>
