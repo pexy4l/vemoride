@@ -1,13 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { cars } from '@/data/dummy';
+import { nigerianStates } from '@/data/states';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MapPin, Calendar, Star, Filter } from 'lucide-react';
+import { Search, Calendar, Star, Filter, Sun, Moon, Globe } from 'lucide-react';
 
 export default function Landing() {
-  const [location, setLocation] = useState('');
+  const { isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { toggleLang, lang } = useLanguage();
+  const [location, setLocation] = useState('all');
   const [date, setDate] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [transmissionFilter, setTransmissionFilter] = useState('all');
@@ -17,7 +24,7 @@ export default function Landing() {
 
   const filteredCars = useMemo(() => {
     let result = cars.filter(c => c.status === 'available');
-    if (location) result = result.filter(c => c.location.toLowerCase().includes(location.toLowerCase()));
+    if (location !== 'all') result = result.filter(c => c.location === location);
     if (date) result = result.filter(c => !c.availability.blockedDates.includes(date));
     if (typeFilter !== 'all') result = result.filter(c => c.type === typeFilter);
     if (transmissionFilter !== 'all') result = result.filter(c => c.transmission === transmissionFilter);
@@ -37,9 +44,17 @@ export default function Landing() {
             <img src="/vemoride.svg" alt="VemoRide" className="h-8 w-8" />
             <span className="font-bold text-lg dark:text-white">VemoRide</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-            <Link to="/register"><Button size="sm" className="bg-brand hover:bg-brand-dark">Register</Button></Link>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>{theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button>
+            <Button variant="ghost" size="icon" onClick={toggleLang}><Globe className="h-4 w-4" /></Button>
+            {isAuthenticated ? (
+              <Link to="/dashboard"><Button size="sm" className="bg-brand hover:bg-brand-dark">Dashboard</Button></Link>
+            ) : (
+              <>
+                <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
+                <Link to="/register"><Button size="sm" className="bg-brand hover:bg-brand-dark">Register</Button></Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -51,9 +66,14 @@ export default function Landing() {
           <p className="text-lg text-white/80 mb-8">Rent cars from trusted owners, with or without a driver</p>
           <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input className="pl-9" placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} />
+              <div>
+                <Select value={location} onValueChange={setLocation}>
+                  <SelectTrigger><SelectValue placeholder="Location" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {nigerianStates.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />

@@ -20,7 +20,7 @@ export const cars = [
     pricing: { daily: 150000, weekly: 900000, monthly: 3200000, weekend: 180000, discount2Days: 5, discount7Days: 10, discount30Days: 20 },
     availability: { blockedDates: ['2026-05-25', '2026-05-26'], maintenance: false },
     withDriver: true, selfDrive: true, assignedDriverId: 'd1',
-    location: 'Lagos Island',
+    location: 'Lagos',
   },
   {
     id: 'c2', ownerId: 'u2', make: 'Mercedes-Benz', model: 'E-Class', year: 2024, type: 'Sedan',
@@ -30,7 +30,7 @@ export const cars = [
     pricing: { daily: 120000, weekly: 750000, monthly: 2800000, weekend: 140000, discount2Days: 5, discount7Days: 12, discount30Days: 25 },
     availability: { blockedDates: [], maintenance: false },
     withDriver: true, selfDrive: false, assignedDriverId: 'd2',
-    location: 'Victoria Island',
+    location: 'Lagos',
   },
   {
     id: 'c3', ownerId: 'u4', make: 'Toyota', model: 'Camry', year: 2022, type: 'Sedan',
@@ -40,7 +40,7 @@ export const cars = [
     pricing: { daily: 60000, weekly: 350000, monthly: 1200000, weekend: 70000, discount2Days: 5, discount7Days: 10, discount30Days: 15 },
     availability: { blockedDates: ['2026-06-01'], maintenance: false },
     withDriver: true, selfDrive: true, assignedDriverId: 'd3',
-    location: 'Ikeja',
+    location: 'Abuja',
   },
   {
     id: 'c4', ownerId: 'u4', make: 'Lexus', model: 'RX 350', year: 2023, type: 'SUV',
@@ -50,7 +50,7 @@ export const cars = [
     pricing: { daily: 100000, weekly: 600000, monthly: 2200000, weekend: 120000, discount2Days: 5, discount7Days: 10, discount30Days: 20 },
     availability: { blockedDates: [], maintenance: false },
     withDriver: true, selfDrive: true, assignedDriverId: null,
-    location: 'Lekki',
+    location: 'Lagos',
   },
   {
     id: 'c5', ownerId: 'u2', make: 'Toyota', model: 'Hiace', year: 2021, type: 'Van',
@@ -60,7 +60,7 @@ export const cars = [
     pricing: { daily: 80000, weekly: 480000, monthly: 1600000, weekend: 95000, discount2Days: 5, discount7Days: 8, discount30Days: 15 },
     availability: { blockedDates: [], maintenance: false },
     withDriver: true, selfDrive: false, assignedDriverId: 'd1',
-    location: 'Surulere',
+    location: 'Rivers',
   },
 ];
 

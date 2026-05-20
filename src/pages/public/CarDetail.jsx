@@ -44,7 +44,7 @@ export default function CarDetail() {
 
             <div>
               <h1 className="text-3xl font-bold dark:text-white">{car.make} {car.model}</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">{car.year} - {car.type} - {car.location}</p>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">{car.year} - {car.type} - {car.location} State</p>
               <div className="flex items-center gap-1 mt-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span className="font-medium dark:text-white">{car.rating}</span><span className="text-gray-500 text-sm">({car.trips} trips)</span></div>
             </div>
 

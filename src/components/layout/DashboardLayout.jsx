@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 const customerNav = [
+  { label: 'Browse Cars', path: '/', icon: Car },
   { label: 'My Bookings', path: '/dashboard/bookings', icon: ClipboardList },
   { label: 'Saved Cars', path: '/dashboard/saved', icon: Bookmark },
   { label: 'Notifications', path: '/dashboard/notifications', icon: Bell },

@@ -15,7 +15,10 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const result = login(email, password);
-    if (result.success) navigate('/dashboard');
+    if (result.success) {
+      if (result.user.role === 'customer') navigate('/');
+      else navigate('/dashboard');
+    }
     else setError(result.error);
   };
 
