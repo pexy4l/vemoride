@@ -45,16 +45,20 @@ const LanguageContext = createContext(null);
 
 export const LanguageProvider = ({ children }) => {
   const [lang, setLang] = useState(() => localStorage.getItem('lang') || 'en');
+  const [onToggleCallback, setOnToggleCallback] = useState(null);
+
+  const registerCallback = (cb) => setOnToggleCallback(() => cb);
 
   const toggleLang = () => {
     const next = lang === 'en' ? 'fr' : 'en';
     setLang(next);
     localStorage.setItem('lang', next);
+    if (onToggleCallback) onToggleCallback(next === 'en' ? 'English' : 'Francais');
   };
 
   const t = (key) => translations[lang]?.[key] || key;
 
-  return <LanguageContext.Provider value={{ lang, toggleLang, t }}>{children}</LanguageContext.Provider>;
+  return <LanguageContext.Provider value={{ lang, toggleLang, t, registerCallback }}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {

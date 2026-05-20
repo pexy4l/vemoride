@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Calendar, Star, Filter, Sun, Moon, Globe } from 'lucide-react';
+import Footer from '@/components/Footer';
+import CookieConsent from '@/components/CookieConsent';
 
 export default function Landing() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toggleLang, lang } = useLanguage();
-  const [location, setLocation] = useState('all');
+  const [location, setLocation] = useState('');
   const [date, setDate] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [transmissionFilter, setTransmissionFilter] = useState('all');
@@ -24,7 +26,7 @@ export default function Landing() {
 
   const filteredCars = useMemo(() => {
     let result = cars.filter(c => c.status === 'available');
-    if (location !== 'all') result = result.filter(c => c.location === location);
+    if (location && location !== 'all') result = result.filter(c => c.location === location);
     if (date) result = result.filter(c => !c.availability.blockedDates.includes(date));
     if (typeFilter !== 'all') result = result.filter(c => c.type === typeFilter);
     if (transmissionFilter !== 'all') result = result.filter(c => c.transmission === transmissionFilter);
@@ -41,14 +43,17 @@ export default function Landing() {
       <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/vemoride.svg" alt="VemoRide" className="h-8 w-8" />
-            <span className="font-bold text-lg dark:text-white">VemoRide</span>
+            <img src="/vemoride2.svg" alt="VemoRide" className="h-10 w-10" />
+            <span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={toggleTheme}>{theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button>
             <Button variant="ghost" size="icon" onClick={toggleLang}><Globe className="h-4 w-4" /></Button>
             {isAuthenticated ? (
-              <Link to="/dashboard"><Button size="sm" className="bg-brand hover:bg-brand-dark">Dashboard</Button></Link>
+              <>
+                <span className="text-sm text-gray-600 dark:text-gray-300 hidden md:inline">{user?.name}</span>
+                <Link to="/dashboard"><Button size="sm" className="bg-brand hover:bg-brand-dark">Dashboard</Button></Link>
+              </>
             ) : (
               <>
                 <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
@@ -68,7 +73,7 @@ export default function Landing() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <Select value={location} onValueChange={setLocation}>
-                  <SelectTrigger><SelectValue placeholder="Location" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select Location" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Locations</SelectItem>
                     {nigerianStates.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -138,6 +143,9 @@ export default function Landing() {
         </div>
         {filteredCars.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-12">No cars match your filters.</p>}
       </section>
+
+      <Footer />
+      <CookieConsent />
     </div>
   );
 }

@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { ToastProvider, useToastNotify } from '@/components/ToastNotify';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 // Public
 import Landing from '@/pages/public/Landing';
 import CarDetail from '@/pages/public/CarDetail';
 import BookingRequest from '@/pages/public/BookingRequest';
+import About from '@/pages/public/About';
+import Contact from '@/pages/public/Contact';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 
@@ -65,6 +68,8 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/car/:id" element={<CarDetail />} />
       <Route path="/car/:id/book" element={<ProtectedRoute><BookingRequest /></ProtectedRoute>} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
@@ -104,14 +109,25 @@ function AppRoutes() {
   );
 }
 
+function ToastWirer() {
+  const showToast = useToastNotify();
+  const { registerCallback: regTheme } = useTheme();
+  const { registerCallback: regLang } = useLanguage();
+  useEffect(() => { regTheme(showToast); regLang(showToast); }, [showToast, regTheme, regLang]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
         <LanguageProvider>
-          <AuthProvider>
-            <AppRoutes />
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <ToastWirer />
+              <AppRoutes />
+            </AuthProvider>
+          </ToastProvider>
         </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>

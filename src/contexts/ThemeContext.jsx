@@ -1,18 +1,25 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [onToggleCallback, setOnToggleCallback] = useState(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
+  const registerCallback = useCallback((cb) => setOnToggleCallback(() => cb), []);
 
-  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    if (onToggleCallback) onToggleCallback(next === 'dark' ? 'Dark Mode' : 'Light Mode');
+  };
+
+  return <ThemeContext.Provider value={{ theme, toggleTheme, registerCallback }}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = () => {

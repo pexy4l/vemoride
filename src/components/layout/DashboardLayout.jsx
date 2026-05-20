@@ -69,8 +69,8 @@ export default function DashboardLayout() {
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 transform transition-transform lg:translate-x-0 lg:static ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-4 border-b dark:border-gray-700">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/vemoride.svg" alt="VemoRide" className="h-8 w-8" />
-            <span className="font-bold text-lg dark:text-white">VemoRide</span>
+            <img src="/vemoride2.svg" alt="VemoRide" className="h-10 w-10" />
+            <span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span>
           </Link>
           <button className="lg:hidden" onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
         </div>
