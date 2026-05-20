@@ -43,7 +43,7 @@ export default function Landing() {
       <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/vemoride3.svg" alt="VemoRide" className="h-10 w-10" />
+            <img src="/vemoride4.svg" alt="VemoRide" className="h-10 w-10" />
             <span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span>
           </Link>
           <div className="flex items-center gap-2">
