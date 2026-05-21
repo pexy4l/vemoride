@@ -120,7 +120,7 @@ export default function CarDetail() {
           <div className="space-y-6">
             {/* Owner */}
             <div className="bg-white dark:bg-gray-800 p-5 rounded-xl border dark:border-gray-700">
-              <h3 className="font-bold dark:text-white mb-3">Car Owner</h3>
+              <h3 className="font-bold dark:text-white mb-3">Partner</h3>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-brand/10 rounded-full flex items-center justify-center text-brand font-bold">{owner?.name?.charAt(0)}</div>
                 <div>

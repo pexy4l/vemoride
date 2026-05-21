@@ -25,18 +25,18 @@ export default function About() {
       <div className="container mx-auto px-4 py-16 max-w-3xl">
         <h1 className="text-4xl font-bold dark:text-white mb-6">About VemoRide</h1>
         <div className="prose dark:prose-invert max-w-none space-y-4 text-gray-700 dark:text-gray-300">
-          <p>VemoRide is a car rental marketplace connecting car owners with customers across Nigeria. Whether you need a car for a day, a week, or a month, we make it easy to find the perfect ride.</p>
+          <p>VemoRide is a car rental marketplace connecting partners with customers across Nigeria. Whether you need a car for a day, a week, or a month, we make it easy to find the perfect ride.</p>
           <h2 className="text-2xl font-bold dark:text-white mt-8">Our Mission</h2>
-          <p>To provide reliable, affordable, and convenient car rental services across Nigeria, empowering car owners to earn from their vehicles and giving customers access to quality cars with flexible options.</p>
+          <p>To provide reliable, affordable, and convenient car rental services across Nigeria, empowering partners to earn from their vehicles and giving customers access to quality cars with flexible options.</p>
           <h2 className="text-2xl font-bold dark:text-white mt-8">How It Works</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Browse available cars by location and date</li>
             <li>Choose between self-drive or with-driver options</li>
-            <li>Submit a booking request to the car owner</li>
+            <li>Submit a booking request to the partner</li>
             <li>Once accepted, your booking is confirmed</li>
             <li>Rate your experience after the trip</li>
           </ul>
-          <h2 className="text-2xl font-bold dark:text-white mt-8">For Car Owners</h2>
+          <h2 className="text-2xl font-bold dark:text-white mt-8">For Partners</h2>
           <p>List your cars, set your own pricing, manage availability, and earn money from your vehicles. You can also add drivers and manage your fleet all from one dashboard.</p>
         </div>
       </div>

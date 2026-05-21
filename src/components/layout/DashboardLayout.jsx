@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Car, CalendarDays, DollarSign, Users, Bell, Star, Settings, LayoutDashboard,
   ClipboardList, MapPin, History, TrendingUp, LogOut, Menu, X, Sun, Moon, Globe,
-  Bookmark, ShieldCheck,
+  Bookmark, ShieldCheck, ArrowLeftRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -37,7 +37,7 @@ const ownerNav = [
 const adminNav = [
   { label: 'Overview', path: '/dashboard/overview', icon: LayoutDashboard },
   { label: 'Customers', path: '/dashboard/customers', icon: Users },
-  { label: 'DriverCarOwners', path: '/dashboard/owners', icon: Car },
+  { label: 'Partners', path: '/dashboard/owners', icon: Car },
   { label: 'All Cars', path: '/dashboard/all-cars', icon: Car },
   { label: 'All Bookings', path: '/dashboard/all-bookings', icon: ClipboardList },
   { label: 'Approvals', path: '/dashboard/approvals', icon: ShieldCheck },
@@ -58,8 +58,10 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewAsCustomer, setViewAsCustomer] = useState(false);
 
-  const navItems = getNavItems(user?.role);
+  const effectiveRole = (user?.role === 'drivercarowner' && viewAsCustomer) ? 'customer' : user?.role;
+  const navItems = getNavItems(effectiveRole);
 
   const handleLogout = () => { logout(); navigate('/'); };
 
@@ -93,7 +95,12 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="p-3 border-t dark:border-gray-700">
+        <div className="p-3 border-t dark:border-gray-700 space-y-1">
+          {user?.role === 'drivercarowner' && (
+            <button onClick={() => setViewAsCustomer(!viewAsCustomer)} className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-brand hover:bg-brand/10">
+              <ArrowLeftRight className="h-4 w-4" /> {viewAsCustomer ? 'Switch to Partner' : 'Switch to Customer'}
+            </button>
+          )}
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
             <LogOut className="h-4 w-4" /> {t('logout')}
           </button>

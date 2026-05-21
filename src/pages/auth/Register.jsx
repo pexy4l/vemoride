@@ -55,7 +55,7 @@ export default function Register() {
                 className={`p-4 rounded-lg border-2 text-center transition-colors ${role === 'drivercarowner' ? 'border-brand bg-brand/5' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'}`}
               >
                 <p className="font-medium dark:text-white">List my Cars</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Car Owner / Driver</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Partner</p>
               </button>
             </div>
           </div>

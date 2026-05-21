@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { bookings, cars, users } from '@/data/dummy';
+import { bookings, cars, users, drivers } from '@/data/dummy';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
@@ -10,10 +10,20 @@ export default function BookingRequests() {
   const myBookings = bookings.filter(b => b.ownerId === user?.id);
   const pending = myBookings.filter(b => b.status === 'pending');
   const others = myBookings.filter(b => b.status !== 'pending');
+  const myDrivers = drivers.filter(d => d.ownerId === user?.id);
+  const isFleet = cars.filter(c => c.ownerId === user?.id).length >= 2;
+
+  const handleAssignDriver = (bookingId, driverId) => {
+    const b = bookings.find(x => x.id === bookingId);
+    if (b) b.driverId = driverId;
+    forceUpdate(n => n + 1);
+  };
 
   const handleAccept = (id) => {
     const b = bookings.find(x => x.id === id);
-    if (b) b.status = 'confirmed';
+    if (!b) return;
+    if (isFleet && !b.driverId) return;
+    b.status = 'confirmed';
     forceUpdate(n => n + 1);
   };
 
@@ -47,9 +57,17 @@ export default function BookingRequests() {
                     <p className="text-brand font-bold">₦{b.totalPrice.toLocaleString()}</p>
                     <p className="text-xs text-gray-500">{b.withDriver ? 'With driver' : 'Self drive'}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleAccept(b.id)}><Check className="h-4 w-4 mr-1" />Accept</Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDecline(b.id)}><X className="h-4 w-4 mr-1" />Decline</Button>
+                  <div className="flex flex-col gap-2">
+                    {isFleet && (
+                      <select className="text-sm p-1.5 rounded border dark:border-gray-600 dark:bg-gray-700 dark:text-white" value={b.driverId || ''} onChange={e => handleAssignDriver(b.id, e.target.value)}>
+                        <option value="">Assign driver...</option>
+                        {myDrivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                      </select>
+                    )}
+                    <div className="flex gap-2">
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleAccept(b.id)} disabled={isFleet && !b.driverId}><Check className="h-4 w-4 mr-1" />Accept</Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDecline(b.id)}><X className="h-4 w-4 mr-1" />Decline</Button>
+                    </div>
                   </div>
                 </div>
               );

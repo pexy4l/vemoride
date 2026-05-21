@@ -1,29 +1,37 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { cars } from '@/data/dummy';
 import { statesLGA } from '@/data/statesLGA';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from '@/components/Footer';
+
+const PER_PAGE = 15;
 
 export default function Browse() {
   const { isAuthenticated, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toggleLang } = useLanguage();
+  const [searchParams] = useSearchParams();
 
-  const [stateFilter, setStateFilter] = useState('');
+  // Init from URL params (persisted from home)
+  const [stateFilter, setStateFilter] = useState(searchParams.get('state') || '');
   const [lgaFilter, setLgaFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [transmissionFilter, setTransmissionFilter] = useState('all');
-  const [priceFilter, setPriceFilter] = useState('all');
-  const [featureFilter, setFeatureFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || 'all');
+  const [priceRange, setPriceRange] = useState([0, 250000]);
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [outOfState, setOutOfState] = useState(false);
+  const [fleetOnly, setFleetOnly] = useState(false);
   const [favourites, setFavourites] = useState([]);
-  const [showFilters, setShowFilters] = useState(true);
+  const [page, setPage] = useState(1);
 
   const allFeatures = useMemo(() => [...new Set(cars.flatMap(c => c.features || []))].sort(), []);
   const lgasForState = useMemo(() => {
@@ -32,30 +40,93 @@ export default function Browse() {
     return found ? found.lgas : [];
   }, [stateFilter]);
 
+  // Fleet owners (2+ cars)
+  const fleetOwnerIds = useMemo(() => {
+    const counts = {};
+    cars.forEach(c => { counts[c.ownerId] = (counts[c.ownerId] || 0) + 1; });
+    return new Set(Object.entries(counts).filter(([, n]) => n >= 2).map(([id]) => id));
+  }, []);
+
   const filteredCars = useMemo(() => {
     let result = cars.filter(c => c.status === 'available');
     if (stateFilter) result = result.filter(c => c.location === stateFilter);
     if (lgaFilter) result = result.filter(c => c.lga === lgaFilter);
     if (typeFilter !== 'all') result = result.filter(c => c.type === typeFilter);
-    if (transmissionFilter !== 'all') result = result.filter(c => c.transmission === transmissionFilter);
-    if (priceFilter === 'low') result = result.filter(c => c.pricing.daily < 80000);
-    else if (priceFilter === 'mid') result = result.filter(c => c.pricing.daily >= 80000 && c.pricing.daily < 130000);
-    else if (priceFilter === 'high') result = result.filter(c => c.pricing.daily >= 130000);
-    if (featureFilter !== 'all') result = result.filter(c => (c.features || []).includes(featureFilter));
+    result = result.filter(c => c.pricing.daily >= priceRange[0] && c.pricing.daily <= priceRange[1]);
+    if (selectedFeatures.length > 0) result = result.filter(c => selectedFeatures.every(f => (c.features || []).includes(f)));
+    if (fleetOnly) result = result.filter(c => fleetOwnerIds.has(c.ownerId));
     return result;
-  }, [stateFilter, lgaFilter, typeFilter, transmissionFilter, priceFilter, featureFilter]);
+  }, [stateFilter, lgaFilter, typeFilter, priceRange, selectedFeatures, fleetOnly, fleetOwnerIds]);
 
+  const totalPages = Math.ceil(filteredCars.length / PER_PAGE);
+  const paginatedCars = filteredCars.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const toggleFeature = (f) => setSelectedFeatures(s => s.includes(f) ? s.filter(x => x !== f) : [...s, f]);
   const toggleFav = (e, carId) => { e.preventDefault(); setFavourites(f => f.includes(carId) ? f.filter(id => id !== carId) : [...f, carId]); };
+
+  const FilterPanel = () => (
+    <div className="space-y-6">
+      <div>
+        <Label className="text-sm font-medium">State</Label>
+        <Select value={stateFilter || 'all'} onValueChange={v => { setStateFilter(v === 'all' ? '' : v); setLgaFilter(''); setPage(1); }}>
+          <SelectTrigger className="mt-1"><SelectValue placeholder="All States" /></SelectTrigger>
+          <SelectContent><SelectItem value="all">All States</SelectItem>{statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}</SelectContent>
+        </Select>
+      </div>
+
+      {stateFilter && (
+        <div>
+          <Label className="text-sm font-medium">Local Government Area</Label>
+          <Select value={lgaFilter || 'all'} onValueChange={v => { setLgaFilter(v === 'all' ? '' : v); setPage(1); }}>
+            <SelectTrigger className="mt-1"><SelectValue placeholder="All LGAs" /></SelectTrigger>
+            <SelectContent><SelectItem value="all">All LGAs</SelectItem>{lgasForState.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div>
+        <Label className="text-sm font-medium">Car Type</Label>
+        <Select value={typeFilter} onValueChange={v => { setTypeFilter(v); setPage(1); }}>
+          <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+          <SelectContent><SelectItem value="all">All Types</SelectItem><SelectItem value="Sedan">Sedan</SelectItem><SelectItem value="SUV">SUV</SelectItem><SelectItem value="Van">Van</SelectItem></SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label className="text-sm font-medium">Price Range (₦/day)</Label>
+        <Slider value={priceRange} onValueChange={v => { setPriceRange(v); setPage(1); }} min={0} max={250000} step={5000} className="mt-3" />
+        <div className="flex justify-between text-xs text-gray-500 mt-1"><span>₦{priceRange[0].toLocaleString()}</span><span>₦{priceRange[1].toLocaleString()}</span></div>
+      </div>
+
+      <div>
+        <Label className="text-sm font-medium mb-2 block">Features</Label>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {allFeatures.map(f => (
+            <div key={f} className="flex items-center gap-2">
+              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => { toggleFeature(f); setPage(1); }} id={`feat-${f}`} />
+              <label htmlFor={`feat-${f}`} className="text-sm dark:text-gray-300 cursor-pointer">{f}</label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox checked={outOfState} onCheckedChange={v => setOutOfState(v)} id="out-of-state" />
+        <label htmlFor="out-of-state" className="text-sm dark:text-gray-300 cursor-pointer">Out of state available</label>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Checkbox checked={fleetOnly} onCheckedChange={v => { setFleetOnly(v); setPage(1); }} id="fleet-only" />
+        <label htmlFor="fleet-only" className="text-sm dark:text-gray-300 cursor-pointer">Fleet partners only</label>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
       <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/vemoride4.svg" alt="VemoRide" className="h-10 w-10" />
-            <span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span>
-          </Link>
+          <Link to="/" className="flex items-center gap-2"><img src="/vemoride4.svg" alt="VemoRide" className="h-10 w-10" /><span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span></Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={toggleTheme}>{theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button>
             <Button variant="ghost" size="icon" onClick={toggleLang}><Globe className="h-4 w-4" /></Button>
@@ -72,79 +143,70 @@ export default function Browse() {
       </header>
 
       <div className="container mx-auto px-4 py-6 flex-1">
-        {/* Toggle filters on mobile */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold dark:text-white">Browse Cars</h1>
-          <Button variant="outline" size="sm" className="md:hidden" onClick={() => setShowFilters(!showFilters)}><SlidersHorizontal className="h-4 w-4 mr-1" />Filters</Button>
-        </div>
+        <div className="flex gap-6">
+          {/* Desktop sidebar filter */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border dark:border-gray-700 sticky top-6">
+              <h2 className="font-bold dark:text-white mb-4">Filters</h2>
+              <FilterPanel />
+            </div>
+          </aside>
 
-        {/* Filters */}
-        <div className={`bg-white dark:bg-gray-800 rounded-xl p-4 border dark:border-gray-700 mb-6 ${showFilters ? '' : 'hidden md:block'}`}>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <Select value={stateFilter} onValueChange={(v) => { setStateFilter(v === 'all' ? '' : v); setLgaFilter(''); }}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="State" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All States</SelectItem>
-                {statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}
-              </SelectContent>
-            </Select>
+          {/* Main content */}
+          <div className="flex-1">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h1 className="text-2xl font-bold dark:text-white">Browse Cars</h1>
+                <p className="text-sm text-gray-500">{filteredCars.length} car{filteredCars.length !== 1 ? 's' : ''} found</p>
+              </div>
+              {/* Mobile filter drawer */}
+              <Sheet>
+                <SheetTrigger asChild><Button variant="outline" size="sm" className="lg:hidden"><SlidersHorizontal className="h-4 w-4 mr-1" />Filters</Button></SheetTrigger>
+                <SheetContent side="left" className="w-80 overflow-y-auto">
+                  <SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader>
+                  <div className="mt-4"><FilterPanel /></div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-            <Select value={lgaFilter || 'all'} onValueChange={(v) => setLgaFilter(v === 'all' ? '' : v)} disabled={!stateFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="LGA" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All LGAs</SelectItem>
-                {lgasForState.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            {/* Car grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {paginatedCars.map(car => {
+                const isFleet = fleetOwnerIds.has(car.ownerId);
+                return (
+                  <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative">
+                    <button onClick={(e) => toggleFav(e, car.id)} className="absolute top-3 right-3 z-10 p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full">
+                      <Heart className={`h-4 w-4 ${favourites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                    </button>
+                    {isFleet && <span className="absolute top-3 left-3 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><Award className="h-3 w-3" />Fleet</span>}
+                    <img src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
+                    <div className="p-4">
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-bold dark:text-white">{car.make} {car.model}</h3>
+                        <div className="flex items-center gap-1 text-sm"><Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /><span className="dark:text-gray-300">{car.rating}</span></div>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{car.year} - {car.type} - {car.seats} seats</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" />{car.lga}, {car.location}</p>
+                      {car.features && <div className="flex flex-wrap gap-1 mt-2">{car.features.slice(0, 3).map(f => <span key={f} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded">{f}</span>)}</div>}
+                      <div className="mt-3"><span className="text-xl font-bold text-brand">₦{car.pricing.daily.toLocaleString()}</span><span className="text-sm text-gray-500">/day</span></div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
 
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Type" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All Types</SelectItem><SelectItem value="Sedan">Sedan</SelectItem><SelectItem value="SUV">SUV</SelectItem><SelectItem value="Van">Van</SelectItem></SelectContent>
-            </Select>
+            {filteredCars.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-12">No cars match your filters.</p>}
 
-            <Select value={transmissionFilter} onValueChange={setTransmissionFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Transmission" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All Transmissions</SelectItem><SelectItem value="Automatic">Automatic</SelectItem><SelectItem value="Manual">Manual</SelectItem></SelectContent>
-            </Select>
-
-            <Select value={priceFilter} onValueChange={setPriceFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Price" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All Prices</SelectItem><SelectItem value="low">Under ₦80k/day</SelectItem><SelectItem value="mid">₦80k-₦130k/day</SelectItem><SelectItem value="high">Above ₦130k/day</SelectItem></SelectContent>
-            </Select>
-
-            <Select value={featureFilter} onValueChange={setFeatureFilter}>
-              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Features" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All Features</SelectItem>{allFeatures.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
-            </Select>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
+                <span className="text-sm dark:text-gray-300">Page {page} of {totalPages}</span>
+                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}><ChevronRight className="h-4 w-4" /></Button>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Results */}
-        <p className="text-sm text-gray-500 mb-4">{filteredCars.length} car{filteredCars.length !== 1 ? 's' : ''} found</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCars.map(car => (
-            <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative">
-              <button onClick={(e) => toggleFav(e, car.id)} className="absolute top-3 right-3 z-10 p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full">
-                <Heart className={`h-4 w-4 ${favourites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-              </button>
-              <img src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold dark:text-white">{car.make} {car.model}</h3>
-                  <div className="flex items-center gap-1 text-sm"><Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /><span className="dark:text-gray-300">{car.rating}</span></div>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{car.year} - {car.type} - {car.seats} seats</p>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mb-2"><MapPin className="h-3 w-3" />{car.lga}, {car.location}</p>
-                {car.features && <div className="flex flex-wrap gap-1 mb-3">{car.features.slice(0, 3).map(f => <span key={f} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded">{f}</span>)}</div>}
-                <div className="flex items-center justify-between">
-                  <div><span className="text-xl font-bold text-brand">₦{car.pricing.daily.toLocaleString()}</span><span className="text-sm text-gray-500">/day</span></div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-        {filteredCars.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-12">No cars match your filters.</p>}
       </div>
 
       <Footer />

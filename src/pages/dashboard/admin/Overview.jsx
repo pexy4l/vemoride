@@ -10,7 +10,7 @@ export default function AdminOverview() {
 
   const stats = [
     { label: 'Customers', value: customers.length, icon: Users, color: 'text-blue-600' },
-    { label: 'Car Owners', value: owners.length, icon: UserCheck, color: 'text-brand' },
+    { label: 'Partners', value: owners.length, icon: UserCheck, color: 'text-brand' },
     { label: 'Total Cars', value: cars.length, icon: Car, color: 'text-purple-600' },
     { label: 'Total Bookings', value: bookings.length, icon: ClipboardList, color: 'text-orange-600' },
     { label: 'Pending Bookings', value: pendingBookings.length, icon: AlertTriangle, color: 'text-yellow-600' },

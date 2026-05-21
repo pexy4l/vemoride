@@ -15,7 +15,7 @@ export default function Owners() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold dark:text-white mb-6">DriverCarOwners ({owners.length})</h1>
+      <h1 className="text-2xl font-bold dark:text-white mb-6">Partners ({owners.length})</h1>
       <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-700"><tr>
