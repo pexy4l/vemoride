@@ -7,7 +7,8 @@ import { ToastProvider, useToastNotify } from '@/components/ToastNotify';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 // Public
-import Landing from '@/pages/public/Landing';
+import Landing from '@/pages/public/Home';
+import Browse from '@/pages/public/Browse';
 import CarDetail from '@/pages/public/CarDetail';
 import BookingRequest from '@/pages/public/BookingRequest';
 import About from '@/pages/public/About';
@@ -66,6 +67,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/browse" element={<Browse />} />
       <Route path="/car/:id" element={<CarDetail />} />
       <Route path="/car/:id/book" element={<ProtectedRoute><BookingRequest /></ProtectedRoute>} />
       <Route path="/about" element={<About />} />

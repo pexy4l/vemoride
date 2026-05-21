@@ -29,7 +29,18 @@ const carTemplates = [
   { make: 'Kia', model: 'Sportage', year: 2023, type: 'SUV', seats: 5, transmission: 'Automatic', img: 'https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=800', daily: 65000 },
 ];
 
-const locations = ['Lagos', 'Abuja', 'Rivers', 'Oyo', 'Kano', 'Delta', 'Ogun', 'Edo', 'Kaduna', 'Enugu'];
+const locations = [
+  { state: 'Lagos', lga: 'Ikeja' },
+  { state: 'Lagos', lga: 'Eti-Osa' },
+  { state: 'Lagos', lga: 'Surulere' },
+  { state: 'Lagos', lga: 'Lagos Island' },
+  { state: 'Federal Capital Territory', lga: 'Municipal Area Council' },
+  { state: 'Rivers', lga: 'Port Harcourt' },
+  { state: 'Oyo', lga: 'Ibadan North' },
+  { state: 'Kano', lga: 'Kano Municipal' },
+  { state: 'Delta', lga: 'Warri South' },
+  { state: 'Enugu', lga: 'Enugu North' },
+];
 const featureSets = [
   ['AC', 'Bluetooth', 'USB Charging'],
   ['AC', 'Leather Seats', 'Sunroof', 'GPS'],
@@ -70,7 +81,8 @@ export const cars = Array.from({ length: 30 }, (_, i) => {
     withDriver: true,
     selfDrive: false,
     assignedDriverId: driverIds[i % 3],
-    location: locations[i % locations.length],
+    location: locations[i % locations.length].state,
+    lga: locations[i % locations.length].lga,
     features: featureSets[i % featureSets.length],
   };
 });
