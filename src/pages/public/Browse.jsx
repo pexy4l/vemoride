@@ -104,7 +104,7 @@ export default function Browse() {
 
             <Select value={transmissionFilter} onValueChange={setTransmissionFilter}>
               <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Transmission" /></SelectTrigger>
-              <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="Automatic">Automatic</SelectItem><SelectItem value="Manual">Manual</SelectItem></SelectContent>
+              <SelectContent><SelectItem value="all">All Transmissions</SelectItem><SelectItem value="Automatic">Automatic</SelectItem><SelectItem value="Manual">Manual</SelectItem></SelectContent>
             </Select>
 
             <Select value={priceFilter} onValueChange={setPriceFilter}>
