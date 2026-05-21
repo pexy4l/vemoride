@@ -1,8 +1,8 @@
 export const users = [
   { id: 'u1', email: 'customer@test.com', password: 'pass', role: 'customer', name: 'Adebayo Ogunlesi', phone: '+234 801 234 5678', avatar: null },
-  { id: 'u2', email: 'owner@test.com', password: 'pass', role: 'drivercarowner', name: 'Chidi Nwosu', phone: '+234 802 345 6789', avatar: null },
+  { id: 'u2', email: 'owner@test.com', password: 'pass', role: 'drivercarowner', name: 'Chidi Nwosu', phone: '+234 802 345 6789', avatar: null, companyImage: '/vemoride4.svg', useCompanyImage: true },
   { id: 'u3', email: 'admin@test.com', password: 'pass', role: 'admin', name: 'Admin User', phone: '+234 800 000 0000', avatar: null },
-  { id: 'u4', email: 'owner2@test.com', password: 'pass', role: 'drivercarowner', name: 'Funke Adeyemi', phone: '+234 803 456 7890', avatar: null },
+  { id: 'u4', email: 'owner2@test.com', password: 'pass', role: 'drivercarowner', name: 'Funke Adeyemi', phone: '+234 803 456 7890', avatar: null, companyImage: null, useCompanyImage: false },
 ];
 
 export const drivers = [

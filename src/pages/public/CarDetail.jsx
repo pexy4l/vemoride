@@ -122,10 +122,14 @@ export default function CarDetail() {
             <div className="bg-white dark:bg-gray-800 p-5 rounded-xl border dark:border-gray-700">
               <h3 className="font-bold dark:text-white mb-3">Partner</h3>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand/10 rounded-full flex items-center justify-center text-brand font-bold">{owner?.name?.charAt(0)}</div>
+                {owner?.useCompanyImage && owner?.companyImage ? (
+                  <img src={owner.companyImage} alt={owner.name} className="w-10 h-10 rounded-full object-cover bg-gray-100" />
+                ) : (
+                  <div className="w-10 h-10 bg-brand/10 rounded-full flex items-center justify-center text-brand font-bold">{owner?.name?.charAt(0)}</div>
+                )}
                 <div>
                   <p className="font-medium dark:text-white">{owner?.name}</p>
-                  <p className="text-sm text-gray-500">Owner</p>
+                  <p className="text-sm text-gray-500">Partner</p>
                 </div>
               </div>
             </div>
