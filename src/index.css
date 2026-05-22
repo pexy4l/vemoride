@@ -80,3 +80,22 @@
 .rdp-day_disabled {
   opacity: 0.3;
 }
+
+/* Custom green scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #04776F;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #065e58;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #04776F transparent;
+}
