@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToastNotify } from '@/components/ToastNotify';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,8 @@ import { Label } from '@/components/ui/label';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const showToast = useToastNotify();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +21,11 @@ export default function Register() {
     e.preventDefault();
     if (!role) { setError('Please select an account type'); return; }
     const result = register(name, email, password, role);
-    if (result.success) navigate('/dashboard');
+    if (result.success) {
+      showToast(`Welcome to VemoRide, ${name}!`);
+      const from = location.state?.from || '/';
+      navigate(from);
+    }
     else setError(result.error);
   };
 

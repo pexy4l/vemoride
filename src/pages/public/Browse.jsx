@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import { cars } from '@/data/dummy';
 import { statesLGA } from '@/data/statesLGA';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,12 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 const PER_PAGE = 15;
+const ALL_FEATURES = ['AC', 'Bluetooth Access', 'Leather Seats', 'Tinted Windows', 'USB Charging'];
 
 export default function Browse() {
   const { isAuthenticated, user } = useAuth();
@@ -22,7 +24,6 @@ export default function Browse() {
   const { toggleLang } = useLanguage();
   const [searchParams] = useSearchParams();
 
-  // Init from URL params (persisted from home)
   const [stateFilter, setStateFilter] = useState(searchParams.get('state') || '');
   const [lgaFilter, setLgaFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || 'all');
@@ -33,14 +34,11 @@ export default function Browse() {
   const [favourites, setFavourites] = useState([]);
   const [page, setPage] = useState(1);
 
-  const allFeatures = useMemo(() => [...new Set(cars.flatMap(c => c.features || []))].sort(), []);
   const lgasForState = useMemo(() => {
     if (!stateFilter) return [];
-    const found = statesLGA.find(s => s.state === stateFilter);
-    return found ? found.lgas : [];
+    return statesLGA.find(s => s.state === stateFilter)?.lgas || [];
   }, [stateFilter]);
 
-  // Fleet owners (2+ cars)
   const fleetOwnerIds = useMemo(() => {
     const counts = {};
     cars.forEach(c => { counts[c.ownerId] = (counts[c.ownerId] || 0) + 1; });
@@ -54,36 +52,42 @@ export default function Browse() {
     if (typeFilter !== 'all') result = result.filter(c => c.type === typeFilter);
     result = result.filter(c => c.pricing.daily >= priceRange[0] && c.pricing.daily <= priceRange[1]);
     if (selectedFeatures.length > 0) result = result.filter(c => selectedFeatures.every(f => (c.features || []).includes(f)));
+    if (outOfState) result = result.filter(c => c.outOfState);
     if (fleetOnly) result = result.filter(c => fleetOwnerIds.has(c.ownerId));
     return result;
-  }, [stateFilter, lgaFilter, typeFilter, priceRange, selectedFeatures, fleetOnly, fleetOwnerIds]);
+  }, [stateFilter, lgaFilter, typeFilter, priceRange, selectedFeatures, outOfState, fleetOnly, fleetOwnerIds]);
 
   const totalPages = Math.ceil(filteredCars.length / PER_PAGE);
   const paginatedCars = filteredCars.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const toggleFeature = (f) => setSelectedFeatures(s => s.includes(f) ? s.filter(x => x !== f) : [...s, f]);
+  const toggleFeature = (f) => { setSelectedFeatures(s => s.includes(f) ? s.filter(x => x !== f) : [...s, f]); setPage(1); };
   const toggleFav = (e, carId) => { e.preventDefault(); setFavourites(f => f.includes(carId) ? f.filter(id => id !== carId) : [...f, carId]); };
 
   const FilterPanel = () => (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* State */}
       <div>
         <Label className="text-sm font-medium">State</Label>
         <Select value={stateFilter || 'all'} onValueChange={v => { setStateFilter(v === 'all' ? '' : v); setLgaFilter(''); setPage(1); }}>
           <SelectTrigger className="mt-1"><SelectValue placeholder="All States" /></SelectTrigger>
-          <SelectContent><SelectItem value="all">All States</SelectItem>{statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}</SelectContent>
+          <SelectContent className="max-h-60 overflow-y-auto"><SelectItem value="all">All States</SelectItem>{statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}</SelectContent>
         </Select>
       </div>
 
-      {stateFilter && (
+      {stateFilter && <>
+        <div className="border-t dark:border-gray-700" />
         <div>
           <Label className="text-sm font-medium">Local Government Area</Label>
           <Select value={lgaFilter || 'all'} onValueChange={v => { setLgaFilter(v === 'all' ? '' : v); setPage(1); }}>
             <SelectTrigger className="mt-1"><SelectValue placeholder="All LGAs" /></SelectTrigger>
-            <SelectContent><SelectItem value="all">All LGAs</SelectItem>{lgasForState.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+            <SelectContent className="max-h-60 overflow-y-auto"><SelectItem value="all">All LGAs</SelectItem>{lgasForState.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
           </Select>
         </div>
-      )}
+      </>}
 
+      <div className="border-t dark:border-gray-700" />
+
+      {/* Type */}
       <div>
         <Label className="text-sm font-medium">Car Type</Label>
         <Select value={typeFilter} onValueChange={v => { setTypeFilter(v); setPage(1); }}>
@@ -92,39 +96,53 @@ export default function Browse() {
         </Select>
       </div>
 
+      <div className="border-t dark:border-gray-700" />
+
+      {/* Price slider */}
       <div>
         <Label className="text-sm font-medium">Price Range (₦/day)</Label>
-        <Slider value={priceRange} onValueChange={v => { setPriceRange(v); setPage(1); }} min={0} max={250000} step={5000} className="mt-3" />
-        <div className="flex justify-between text-xs text-gray-500 mt-1"><span>₦{priceRange[0].toLocaleString()}</span><span>₦{priceRange[1].toLocaleString()}</span></div>
+        <div className="mt-4 px-1">
+          <Slider range min={0} max={250000} step={5000} value={priceRange} onChange={v => { setPriceRange(v); setPage(1); }}
+            trackStyle={[{ backgroundColor: '#04776F' }]} handleStyle={[{ borderColor: '#04776F', backgroundColor: '#fff' }, { borderColor: '#04776F', backgroundColor: '#fff' }]}
+            railStyle={{ backgroundColor: '#e5e7eb' }} />
+        </div>
+        <div className="flex justify-between text-xs text-gray-500 mt-2"><span>₦{priceRange[0].toLocaleString()}</span><span>₦{priceRange[1].toLocaleString()}</span></div>
       </div>
 
+      <div className="border-t dark:border-gray-700" />
+
+      {/* Features */}
       <div>
         <Label className="text-sm font-medium mb-2 block">Features</Label>
-        <div className="space-y-2 max-h-40 overflow-y-auto">
-          {allFeatures.map(f => (
+        <div className="space-y-2">
+          {ALL_FEATURES.map(f => (
             <div key={f} className="flex items-center gap-2">
-              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => { toggleFeature(f); setPage(1); }} id={`feat-${f}`} />
+              <Checkbox checked={selectedFeatures.includes(f)} onCheckedChange={() => toggleFeature(f)} id={`feat-${f}`} />
               <label htmlFor={`feat-${f}`} className="text-sm dark:text-gray-300 cursor-pointer">{f}</label>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Checkbox checked={outOfState} onCheckedChange={v => setOutOfState(v)} id="out-of-state" />
-        <label htmlFor="out-of-state" className="text-sm dark:text-gray-300 cursor-pointer">Out of state available</label>
-      </div>
+      <div className="border-t dark:border-gray-700" />
 
-      <div className="flex items-center gap-2">
-        <Checkbox checked={fleetOnly} onCheckedChange={v => { setFleetOnly(v); setPage(1); }} id="fleet-only" />
-        <label htmlFor="fleet-only" className="text-sm dark:text-gray-300 cursor-pointer">Fleet partners only</label>
+      {/* Toggles */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Checkbox checked={outOfState} onCheckedChange={v => { setOutOfState(v); setPage(1); }} id="out-of-state" />
+          <label htmlFor="out-of-state" className="text-sm dark:text-gray-300 cursor-pointer">Out of state available</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Checkbox checked={fleetOnly} onCheckedChange={v => { setFleetOnly(v); setPage(1); }} id="fleet-only" />
+          <label htmlFor="fleet-only" className="text-sm dark:text-gray-300 cursor-pointer">Fleet partners only</label>
+        </div>
       </div>
     </div>
   );
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2"><img src="/vemoride4.svg" alt="VemoRide" className="h-10 w-10" /><span className="font-bold text-lg dark:text-white">Vemo<span className="text-brand">Ride</span></span></Link>
           <div className="flex items-center gap-2">
@@ -144,37 +162,30 @@ export default function Browse() {
 
       <div className="container mx-auto px-4 py-6 flex-1">
         <div className="flex gap-6">
-          {/* Desktop sidebar filter */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border dark:border-gray-700 sticky top-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 sticky top-6">
               <h2 className="font-bold dark:text-white mb-4">Filters</h2>
               <FilterPanel />
             </div>
           </aside>
 
-          {/* Main content */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h1 className="text-2xl font-bold dark:text-white">Browse Cars</h1>
                 <p className="text-sm text-gray-500">{filteredCars.length} car{filteredCars.length !== 1 ? 's' : ''} found</p>
               </div>
-              {/* Mobile filter drawer */}
               <Sheet>
                 <SheetTrigger asChild><Button variant="outline" size="sm" className="lg:hidden"><SlidersHorizontal className="h-4 w-4 mr-1" />Filters</Button></SheetTrigger>
-                <SheetContent side="left" className="w-80 overflow-y-auto">
-                  <SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader>
-                  <div className="mt-4"><FilterPanel /></div>
-                </SheetContent>
+                <SheetContent side="left" className="w-80 overflow-y-auto"><SheetHeader><SheetTitle>Filters</SheetTitle></SheetHeader><div className="mt-4"><FilterPanel /></div></SheetContent>
               </Sheet>
             </div>
 
-            {/* Car grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
               {paginatedCars.map(car => {
                 const isFleet = fleetOwnerIds.has(car.ownerId);
                 return (
-                  <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative">
+                  <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative border border-gray-200 dark:border-gray-700">
                     <button onClick={(e) => toggleFav(e, car.id)} className="absolute top-3 right-3 z-10 p-1.5 bg-white/80 dark:bg-gray-800/80 rounded-full">
                       <Heart className={`h-4 w-4 ${favourites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                     </button>
@@ -197,7 +208,6 @@ export default function Browse() {
 
             {filteredCars.length === 0 && <p className="text-center text-gray-500 dark:text-gray-400 py-12">No cars match your filters.</p>}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">
                 <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
