@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DayPicker } from 'react-day-picker';
 import { addMonths } from 'date-fns';
 import { cars } from '@/data/dummy';
 import { statesLGA } from '@/data/statesLGA';
@@ -18,6 +17,7 @@ import Footer from '@/components/Footer';
 import CarImage from '@/components/CarImage';
 import PriceRangeSlider from '@/components/PriceRangeSlider';
 import SearchableSelect from '@/components/SearchableSelect';
+import Calendar from '@/components/Calendar';
 
 const PER_PAGE = 15;
 const ALL_FEATURES = ['AC', 'Bluetooth Access', 'Leather Seats', 'Tinted Windows', 'USB Charging'];
@@ -126,7 +126,7 @@ export default function Browse() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <DayPicker mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={{ before: today, after: maxDate }} className="rounded-xl border shadow-lg bg-white dark:bg-gray-800" />
+            <Calendar selected={selectedDate} onSelect={setSelectedDate} minDate={today} maxDate={maxDate} />
           </PopoverContent>
         </Popover>
       </div>

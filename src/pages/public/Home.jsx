@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { DayPicker } from 'react-day-picker';
 import { addMonths } from 'date-fns';
 import { cars } from '@/data/dummy';
 import { statesLGA } from '@/data/statesLGA';
@@ -8,12 +7,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sun, Moon, Globe, Car, Shield, Clock, Star, Award, CalendarDays } from 'lucide-react';
 import Footer from '@/components/Footer';
 import CookieConsent from '@/components/CookieConsent';
 import CarImage from '@/components/CarImage';
+import SearchableSelect from '@/components/SearchableSelect';
+import Calendar from '@/components/Calendar';
 
 export default function Home() {
   const { isAuthenticated, user } = useAuth();
@@ -71,20 +71,22 @@ export default function Home() {
 
           <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Select value={state || 'all'} onValueChange={v => setState(v === 'all' ? '' : v)}>
-                <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"><SelectValue placeholder="Select State" /></SelectTrigger>
-                <SelectContent className="max-h-60 overflow-y-auto"><SelectItem value="all">All States</SelectItem>{statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}</SelectContent>
-              </Select>
+              <SearchableSelect
+                value={state || 'all'}
+                onChange={v => setState(v === 'all' ? '' : v)}
+                options={[{ value: 'all', label: 'All States' }, ...statesLGA.map(s => ({ value: s.state, label: s.state }))]}
+                placeholder="Select State"
+              />
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-input">
+                  <Button variant="outline" className="w-full justify-start text-left font-normal bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
                     <CalendarDays className="h-4 w-4 mr-2 text-gray-400" />
                     {selectedDate ? selectedDate.toLocaleDateString() : 'Pick a date'}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <DayPicker mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={{ before: today, after: maxDate }} className="rounded-xl border shadow-lg bg-white dark:bg-gray-800" />
+                  <Calendar selected={selectedDate} onSelect={setSelectedDate} minDate={today} maxDate={maxDate} />
                 </PopoverContent>
               </Popover>
 
