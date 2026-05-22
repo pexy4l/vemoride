@@ -63,7 +63,7 @@ export default function Browse() {
     if (outOfState) result = result.filter(c => c.outOfState);
     if (fleetOnly) result = result.filter(c => fleetOwnerIds.has(c.ownerId));
     return result;
-  }, [stateFilter, lgaFilter, typeFilter, priceRange, selectedFeatures, outOfState, fleetOnly, fleetOwnerIds]);
+  }, [stateFilter, lgaFilter, typeFilter, priceMin, priceMax, selectedFeatures, outOfState, fleetOnly, fleetOwnerIds]);
 
   const totalPages = Math.ceil(filteredCars.length / PER_PAGE);
   const paginatedCars = filteredCars.slice((page - 1) * PER_PAGE, page * PER_PAGE);
