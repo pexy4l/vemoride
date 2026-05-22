@@ -127,7 +127,7 @@ export default function Browse() {
       {/* Price */}
       <div>
         <Label className="text-sm font-medium mb-2 block">Price Range (₦/day)</Label>
-        <PriceRangeSlider min={0} max={250000} step={5000} value={[priceMin, priceMax]} onChange={([min, max]) => { setPriceMin(min); setPriceMax(max); setPage(1); }} />
+        <PriceRangeSlider min={0} max={250000} step={1000} value={[priceMin, priceMax]} onChange={([min, max]) => { setPriceMin(min); setPriceMax(max); setPage(1); }} />
       </div>
 
       <div className="border-t dark:border-gray-700" />
