@@ -4,6 +4,7 @@ import { cars, drivers, users } from '@/data/dummy';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Star, Users, Settings, MapPin, Calendar, CheckCircle, ArrowLeft } from 'lucide-react';
+import CarImage from '@/components/CarImage';
 
 export default function CarDetail() {
   const { id } = useParams();
@@ -40,7 +41,7 @@ export default function CarDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left - Car info */}
           <div className="lg:col-span-2 space-y-6">
-            <img src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-72 object-cover rounded-xl" />
+            <CarImage src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-72 object-cover rounded-xl" />
 
             <div>
               <h1 className="text-3xl font-bold dark:text-white">{car.make} {car.model}</h1>

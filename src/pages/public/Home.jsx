@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Sun, Moon, Globe, Car, Shield, Clock, Star, Award, CalendarDays } from 'lucide-react';
 import Footer from '@/components/Footer';
 import CookieConsent from '@/components/CookieConsent';
+import CarImage from '@/components/CarImage';
 
 export default function Home() {
   const { isAuthenticated, user } = useAuth();
@@ -83,7 +84,7 @@ export default function Home() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <DayPicker mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={{ before: today, after: maxDate }} />
+                  <DayPicker mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={{ before: today, after: maxDate }} className="rounded-xl border shadow-lg bg-white dark:bg-gray-800" />
                 </PopoverContent>
               </Popover>
 
@@ -101,7 +102,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {spotlightCars.map(car => (
                 <Link key={car.id} to={`/car/${car.id}`} className="bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-600">
-                  <img src={car.images[0]} alt={car.make} className="w-full h-40 object-cover" />
+                  <CarImage src={car.images[0]} alt={car.make} className="w-full h-40 object-cover" />
                   <div className="p-3">
                     <p className="text-sm font-bold dark:text-white truncate">{car.make} {car.model}</p>
                     <div className="flex items-center justify-between mt-1">

@@ -1,19 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import { DayPicker } from 'react-day-picker';
+import { addMonths } from 'date-fns';
 import { cars } from '@/data/dummy';
 import { statesLGA } from '@/data/statesLGA';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import Footer from '@/components/Footer';
+import CarImage from '@/components/CarImage';
 
 const PER_PAGE = 15;
 const ALL_FEATURES = ['AC', 'Bluetooth Access', 'Leather Seats', 'Tinted Windows', 'USB Charging'];
@@ -27,12 +30,17 @@ export default function Browse() {
   const [stateFilter, setStateFilter] = useState(searchParams.get('state') || '');
   const [lgaFilter, setLgaFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || 'all');
-  const [priceRange, setPriceRange] = useState([0, 250000]);
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(250000);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [outOfState, setOutOfState] = useState(false);
   const [fleetOnly, setFleetOnly] = useState(false);
   const [favourites, setFavourites] = useState([]);
   const [page, setPage] = useState(1);
+
+  const today = new Date();
+  const maxDate = addMonths(today, 3);
 
   const lgasForState = useMemo(() => {
     if (!stateFilter) return [];
@@ -50,7 +58,7 @@ export default function Browse() {
     if (stateFilter) result = result.filter(c => c.location === stateFilter);
     if (lgaFilter) result = result.filter(c => c.lga === lgaFilter);
     if (typeFilter !== 'all') result = result.filter(c => c.type === typeFilter);
-    result = result.filter(c => c.pricing.daily >= priceRange[0] && c.pricing.daily <= priceRange[1]);
+    result = result.filter(c => c.pricing.daily >= priceMin && c.pricing.daily <= priceMax);
     if (selectedFeatures.length > 0) result = result.filter(c => selectedFeatures.every(f => (c.features || []).includes(f)));
     if (outOfState) result = result.filter(c => c.outOfState);
     if (fleetOnly) result = result.filter(c => fleetOwnerIds.has(c.ownerId));
@@ -98,15 +106,32 @@ export default function Browse() {
 
       <div className="border-t dark:border-gray-700" />
 
-      {/* Price slider */}
+      {/* Date */}
       <div>
-        <Label className="text-sm font-medium">Price Range (₦/day)</Label>
-        <div className="mt-4 px-1">
-          <Slider range min={0} max={250000} step={5000} value={priceRange} onChange={v => { setPriceRange(v); setPage(1); }}
-            trackStyle={[{ backgroundColor: '#04776F' }]} handleStyle={[{ borderColor: '#04776F', backgroundColor: '#fff' }, { borderColor: '#04776F', backgroundColor: '#fff' }]}
-            railStyle={{ backgroundColor: '#e5e7eb' }} />
+        <Label className="text-sm font-medium mb-2 block">Date</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="w-full justify-start text-left font-normal text-sm">
+              <CalendarDays className="h-4 w-4 mr-2 text-gray-400" />
+              {selectedDate ? selectedDate.toLocaleDateString() : 'Select date'}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <DayPicker mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={{ before: today, after: maxDate }} className="rounded-xl border shadow-lg bg-white dark:bg-gray-800" />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="border-t dark:border-gray-700" />
+
+      {/* Price */}
+      <div>
+        <Label className="text-sm font-medium mb-2 block">Price Range (₦/day)</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Input type="number" placeholder="Min" value={priceMin || ''} onChange={e => { setPriceMin(Number(e.target.value) || 0); setPage(1); }} className="text-sm" />
+          <Input type="number" placeholder="Max" value={priceMax === 250000 ? '' : priceMax} onChange={e => { setPriceMax(Number(e.target.value) || 250000); setPage(1); }} className="text-sm" />
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-2"><span>₦{priceRange[0].toLocaleString()}</span><span>₦{priceRange[1].toLocaleString()}</span></div>
+        <p className="text-xs text-gray-400 mt-1">Leave empty for no limit</p>
       </div>
 
       <div className="border-t dark:border-gray-700" />
@@ -190,7 +215,7 @@ export default function Browse() {
                       <Heart className={`h-4 w-4 ${favourites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                     </button>
                     {isFleet && <span className="absolute top-3 left-3 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><Award className="h-3 w-3" />Fleet</span>}
-                    <img src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
+                    <CarImage src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-44 object-cover" />
                     <div className="p-4">
                       <div className="flex justify-between items-start mb-1">
                         <h3 className="font-bold dark:text-white">{car.make} {car.model}</h3>

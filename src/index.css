@@ -61,3 +61,22 @@
   background-color: #128C7E;
   transform: scale(1.1);
 }
+
+/* Date picker styles */
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #04776F;
+  --rdp-background-color: #04776F1a;
+  margin: 0;
+  padding: 1rem;
+}
+.rdp-day_selected, .rdp-day_selected:hover {
+  background-color: #04776F !important;
+  color: white !important;
+}
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: #04776F1a;
+}
+.rdp-day_disabled {
+  opacity: 0.3;
+}

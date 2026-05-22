@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     const result = login(email, password);
     if (result.success) {
-      if (result.user.role === 'customer') navigate('/');
+      if (result.user.role === 'customer') navigate(from);
       else navigate('/dashboard');
     }
     else setError(result.error);
@@ -26,7 +28,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <img src="/vemoride4.svg" alt="VemoRide" className="h-12 w-12 mx-auto mb-4" />
+          <Link to="/">
+            <img src="/vemoride4.svg" alt="VemoRide" className="h-12 w-12 mx-auto mb-4" />
+          </Link>
           <h1 className="text-2xl font-bold dark:text-white">Welcome back</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Sign in to your account</p>
         </div>
