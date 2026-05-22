@@ -8,7 +8,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,6 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import Footer from '@/components/Footer';
 import CarImage from '@/components/CarImage';
+import PriceRangeSlider from '@/components/PriceRangeSlider';
 
 const PER_PAGE = 15;
 const ALL_FEATURES = ['AC', 'Bluetooth Access', 'Leather Seats', 'Tinted Windows', 'USB Charging'];
@@ -127,11 +127,7 @@ export default function Browse() {
       {/* Price */}
       <div>
         <Label className="text-sm font-medium mb-2 block">Price Range (₦/day)</Label>
-        <div className="grid grid-cols-2 gap-2">
-          <Input type="number" placeholder="Min" value={priceMin || ''} onChange={e => { setPriceMin(Number(e.target.value) || 0); setPage(1); }} className="text-sm" />
-          <Input type="number" placeholder="Max" value={priceMax === 250000 ? '' : priceMax} onChange={e => { setPriceMax(Number(e.target.value) || 250000); setPage(1); }} className="text-sm" />
-        </div>
-        <p className="text-xs text-gray-400 mt-1">Leave empty for no limit</p>
+        <PriceRangeSlider min={0} max={250000} step={5000} value={[priceMin, priceMax]} onChange={([min, max]) => { setPriceMin(min); setPriceMax(max); setPage(1); }} />
       </div>
 
       <div className="border-t dark:border-gray-700" />
