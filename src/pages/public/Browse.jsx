@@ -17,6 +17,7 @@ import { Star, MapPin, Heart, Sun, Moon, Globe, SlidersHorizontal, Award, Chevro
 import Footer from '@/components/Footer';
 import CarImage from '@/components/CarImage';
 import PriceRangeSlider from '@/components/PriceRangeSlider';
+import SearchableSelect from '@/components/SearchableSelect';
 
 const PER_PAGE = 15;
 const ALL_FEATURES = ['AC', 'Bluetooth Access', 'Leather Seats', 'Tinted Windows', 'USB Charging'];
@@ -76,20 +77,28 @@ export default function Browse() {
       {/* State */}
       <div>
         <Label className="text-sm font-medium">State</Label>
-        <Select value={stateFilter || 'all'} onValueChange={v => { setStateFilter(v === 'all' ? '' : v); setLgaFilter(''); setPage(1); }}>
-          <SelectTrigger className="mt-1"><SelectValue placeholder="All States" /></SelectTrigger>
-          <SelectContent className="max-h-60 overflow-y-auto"><SelectItem value="all">All States</SelectItem>{statesLGA.map(s => <SelectItem key={s.state} value={s.state}>{s.state}</SelectItem>)}</SelectContent>
-        </Select>
+        <div className="mt-1">
+          <SearchableSelect
+            value={stateFilter}
+            onChange={v => { setStateFilter(v === 'all' ? '' : v); setLgaFilter(''); setPage(1); }}
+            options={[{ value: 'all', label: 'All States' }, ...statesLGA.map(s => ({ value: s.state, label: s.state }))]}
+            placeholder="All States"
+          />
+        </div>
       </div>
 
       {stateFilter && <>
         <div className="border-t dark:border-gray-700" />
         <div>
           <Label className="text-sm font-medium">Local Government Area</Label>
-          <Select value={lgaFilter || 'all'} onValueChange={v => { setLgaFilter(v === 'all' ? '' : v); setPage(1); }}>
-            <SelectTrigger className="mt-1"><SelectValue placeholder="All LGAs" /></SelectTrigger>
-            <SelectContent className="max-h-60 overflow-y-auto"><SelectItem value="all">All LGAs</SelectItem>{lgasForState.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
-          </Select>
+          <div className="mt-1">
+            <SearchableSelect
+              value={lgaFilter || 'all'}
+              onChange={v => { setLgaFilter(v === 'all' ? '' : v); setPage(1); }}
+              options={[{ value: 'all', label: 'All LGAs' }, ...lgasForState.map(l => ({ value: l, label: l }))]}
+              placeholder="All LGAs"
+            />
+          </div>
         </div>
       </>}
 
