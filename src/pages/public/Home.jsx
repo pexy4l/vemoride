@@ -87,7 +87,7 @@ export default function Home() {
       <section className="py-8 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div><p className="text-2xl font-bold text-brand">70+</p><p className="text-sm text-gray-500">Cars Available</p></div>
-          <div><p className="text-2xl font-bold text-brand">37</p><p className="text-sm text-gray-500">States Covered</p></div>
+          <div><p className="text-2xl font-bold text-brand">36 + FCT</p><p className="text-sm text-gray-500">States Covered</p></div>
           <div><p className="text-2xl font-bold text-brand">500+</p><p className="text-sm text-gray-500">Happy Customers</p></div>
           <div><p className="text-2xl font-bold text-brand">4.8</p><p className="text-sm text-gray-500">Average Rating</p></div>
         </div>
