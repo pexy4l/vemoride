@@ -57,7 +57,7 @@ export default function Home() {
                 <Link to="/dashboard"><Button size="sm" variant="outline">Dashboard</Button></Link>
               </>
             ) : (
-              <Link to="/login"><Button size="sm" className="bg-brand hover:bg-brand-dark">Sign In</Button></Link>
+              <Link to="/login"><Button size="sm" className="bg-brand hover:bg-brand-dark">Log In</Button></Link>
             )}
           </div>
         </div>

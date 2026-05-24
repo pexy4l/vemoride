@@ -165,7 +165,7 @@ export default function CarDetail() {
               </Link>
             ) : (
               <Link to="/login">
-                <Button className="w-full bg-brand hover:bg-brand-dark text-lg py-6">Sign In to Book</Button>
+                <Button className="w-full bg-brand hover:bg-brand-dark text-lg py-6">Log In to Book</Button>
               </Link>
             )}
           </div>

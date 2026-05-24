@@ -32,7 +32,7 @@ export default function Login() {
             <img src="/vemoride4.svg" alt="VemoRide" className="h-12 w-12 mx-auto mb-4" />
           </Link>
           <h1 className="text-2xl font-bold dark:text-white">Welcome back</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Sign in to your account</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Log in to your account</p>
         </div>
 
         {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
@@ -40,7 +40,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div><Label>Email</Label><Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required /></div>
           <div><Label>Password</Label><Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password" required /></div>
-          <Button type="submit" className="w-full bg-brand hover:bg-brand-dark">Sign In</Button>
+          <Button type="submit" className="w-full bg-brand hover:bg-brand-dark">Log In</Button>
         </form>
 
         <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">

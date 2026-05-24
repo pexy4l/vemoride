@@ -5,7 +5,7 @@ const translations = {
     logout: 'Logout',
     search: 'Search',
     bookNow: 'Book Now',
-    signIn: 'Sign In',
+    signIn: 'Log In',
     register: 'Register',
     myBookings: 'My Bookings',
     savedCars: 'Saved Cars',
