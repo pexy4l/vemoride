@@ -6,14 +6,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Car, CalendarDays, DollarSign, Users, Bell, Star, Settings, LayoutDashboard,
   ClipboardList, MapPin, History, TrendingUp, LogOut, Menu, X, Sun, Moon, Globe,
-  Bookmark, ShieldCheck, ArrowLeftRight,
+  Bookmark, ShieldCheck, ArrowLeftRight, Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const customerNav = [
   { label: 'Browse Cars', path: '/browse', icon: Car },
   { label: 'My Bookings', path: '/dashboard/bookings', icon: ClipboardList },
-  { label: 'Saved Cars', path: '/dashboard/saved', icon: Bookmark },
   { label: 'Notifications', path: '/dashboard/notifications', icon: Bell },
   { label: 'Ratings & Reviews', path: '/dashboard/ratings', icon: Star },
   { label: 'Profile Settings', path: '/dashboard/profile', icon: Settings },
@@ -115,6 +114,7 @@ export default function DashboardLayout() {
         <header className="h-16 bg-white dark:bg-gray-800 border-b dark:border-gray-700 flex items-center justify-between px-4">
           <button className="lg:hidden" onClick={() => setSidebarOpen(true)}><Menu className="h-5 w-5 dark:text-white" /></button>
           <div className="flex items-center gap-2 ml-auto">
+            <Link to="/dashboard/saved" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><Heart className="h-5 w-5 text-gray-500 dark:text-gray-400" /></Link>
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>

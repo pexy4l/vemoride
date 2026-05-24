@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Star } from 'lucide-react';
+import ImageUploader from '@/components/ImageUploader';
 
 export default function MyCars() {
   const { user } = useAuth();
@@ -95,7 +96,7 @@ function CarForm({ onSave, initial }) {
         <div><Label>Seats</Label><Input type="number" value={form.seats} onChange={e => setField('seats', +e.target.value)} /></div>
       </div>
       <div><Label>Location</Label><Input value={form.location} onChange={e => setField('location', e.target.value)} placeholder="e.g. Lagos Island" /></div>
-      <div><Label>Image URL</Label><Input value={form.images[0]} onChange={e => setField('images', [e.target.value])} /></div>
+      <div><Label>Car Images</Label><ImageUploader images={form.images} onChange={imgs => setField('images', imgs)} /></div>
       <div><Label>Description</Label><Input value={form.description} onChange={e => setField('description', e.target.value)} /></div>
       <div className="grid grid-cols-2 gap-3">
         <div><Label>Daily (₦)</Label><Input type="number" value={form.pricing.daily} onChange={e => setPricing('daily', e.target.value)} /></div>
