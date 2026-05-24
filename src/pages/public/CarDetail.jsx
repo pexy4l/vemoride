@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { cars, drivers, users } from '@/data/dummy';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,7 @@ export default function CarDetail() {
 
   const owner = users.find(u => u.id === car.ownerId);
   const driver = drivers.find(d => d.id === car.assignedDriverId);
+  const [activeImg, setActiveImg] = useState(0);
 
   const blockedSet = new Set(car.availability.blockedDates);
   const today = new Date();
@@ -41,7 +42,18 @@ export default function CarDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left - Car info */}
           <div className="lg:col-span-2 space-y-6">
-            <CarImage src={car.images[0]} alt={`${car.make} ${car.model}`} className="w-full h-72 object-cover rounded-xl" />
+            <div>
+              <CarImage src={car.images[activeImg]} alt={`${car.make} ${car.model}`} className="w-full h-72 object-cover rounded-xl" />
+              {car.images.length > 1 && (
+                <div className="grid grid-cols-5 gap-2 mt-2">
+                  {car.images.map((img, i) => (
+                    <button key={i} onClick={() => setActiveImg(i)} className={`rounded-lg overflow-hidden border-2 ${i === activeImg ? 'border-brand' : 'border-transparent'}`}>
+                      <CarImage src={img} alt={`View ${i + 1}`} className="w-full h-16 object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div>
               <h1 className="text-3xl font-bold dark:text-white">{car.make} {car.model}</h1>
@@ -159,15 +171,17 @@ export default function CarDetail() {
             </div>
 
             {/* Book button */}
+            <div className="pt-4">
             {isAuthenticated ? (
               <Link to={`/car/${car.id}/book`}>
                 <Button className="w-full bg-brand hover:bg-brand-dark text-lg py-6">Book This Car</Button>
               </Link>
             ) : (
               <Link to="/login">
-                <Button className="w-full bg-brand hover:bg-brand-dark text-lg py-6">Log In to Book</Button>
+                <Button className="w-full bg-brand hover:bg-brand-dark text-lg py-6">Login to Book</Button>
               </Link>
             )}
+            </div>
           </div>
         </div>
       </div>
